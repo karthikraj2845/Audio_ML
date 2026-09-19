@@ -194,7 +194,5 @@ python -m src.evaluate
 
 ---
 
-## 📄 Resume Bullet Point (Tailored for Audio & Edge-AI)
 
-> **Audio ML Classifier (Speech Command Recognition)**
-> Built an end-to-end audio classification pipeline: performed preprocessing (silence trimming, 16 kHz resampling, fixed-length padding) and designed advanced DSP feature extraction (STFT, 20 MFCCs, Δ/Δ² velocity/acceleration, ZCR, and 3-stage temporal segment pooling) using Librosa and SciPy; developed and benchmarked multiple ML/DL architectures (Random Forest, SVM, 2D AudioCNN, PyTorch MLP), driving classification accuracy from a 56% baseline to **80.0% test accuracy (80.5% weighted F1)** on Google Speech Commands; eliminated consonant-vowel confusion via phonetic onset-nucleus-coda temporal pooling. Directly applied signal processing and low-latency machine learning fundamentals for edge-AI audio applications.
+
