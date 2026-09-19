@@ -24,31 +24,23 @@ def extract_dataset_features(
     df_index: pd.DataFrame,
     sr: int = 16000,
     duration: float = 1.0,
-    n_mfcc: int = 13,
+    n_mfcc: int = 20,
 ) -> pd.DataFrame:
-    """Iterate through audio files, preprocess, extract MFCC summary statistics,
-
+    """Iterate through audio files, preprocess, extract advanced temporal-segmented DSP features,
     and construct a tabular feature DataFrame.
-
-    Args:
-        df_index: DataFrame containing 'filepath' and 'label' columns.
-        sr: Audio sample rate.
-        duration: Target clip length in seconds.
-        n_mfcc: Number of MFCC coefficients.
-
-    Returns:
-        pd.DataFrame containing feature columns, label, and source filepath.
     """
-    feature_rows = []
+    from src.features import extract_advanced_dsp_vector
 
-    print(f"Extracting DSP features for {len(df_index)} audio clips...")
+    feature_rows = []
+    print(f"Extracting temporal-segmented DSP features (n_mfcc={n_mfcc}, 3 segments + deltas) for {len(df_index)} clips...")
+
     for idx, row in df_index.iterrows():
         filepath = row["filepath"]
         label = row["label"]
 
         try:
             y = load_and_fix_length(filepath, sr=sr, duration=duration)
-            feat_vec, feat_names = extract_full_feature_vector(y, sr=sr, n_mfcc=n_mfcc)
+            feat_vec, feat_names = extract_advanced_dsp_vector(y, sr=sr, n_mfcc=n_mfcc, n_segments=3)
 
             row_dict = {name: val for name, val in zip(feat_names, feat_vec)}
             row_dict["label"] = label
@@ -69,7 +61,6 @@ def train_classical_models(
     random_state: int = 42,
 ) -> Dict[str, Any]:
     """Complete pipeline to build dataset, extract DSP features, train classifiers,
-
     and persist models.
     """
     os.makedirs(processed_dir, exist_ok=True)
@@ -93,7 +84,7 @@ def train_classical_models(
 
     # 2. Extract DSP Features
     features_csv_path = os.path.join(processed_dir, "features.csv")
-    features_df = extract_dataset_features(df_index)
+    features_df = extract_dataset_features(df_index, n_mfcc=20)
     features_df.to_csv(features_csv_path, index=False)
     print(f"Features table saved to {features_csv_path} (Shape: {features_df.shape})")
 
@@ -116,11 +107,12 @@ def train_classical_models(
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    # 4. Train RandomForest Classifier
-    print("\nTraining Random Forest Classifier (n_estimators=200)...")
+    # 4. Train RandomForest Classifier with tuned parameters
+    print("\nTraining Tuned Random Forest Classifier (n_estimators=300, min_samples_split=3)...")
     rf_clf = RandomForestClassifier(
-        n_estimators=200,
-        max_depth=15,
+        n_estimators=300,
+        min_samples_split=3,
+        max_features="sqrt",
         random_state=random_state,
         n_jobs=-1,
     )
@@ -129,9 +121,9 @@ def train_classical_models(
     rf_test_acc = accuracy_score(y_test, rf_clf.predict(X_test))
     print(f"Random Forest -> Train Acc: {rf_train_acc * 100:.2f}%, Test Acc: {rf_test_acc * 100:.2f}%")
 
-    # Train SVM Benchmark
-    print("Training Support Vector Machine (RBF Kernel)...")
-    svm_clf = SVC(kernel="rbf", C=5.0, gamma="scale", probability=True, random_state=random_state)
+    # Train Tuned SVM Benchmark (RBF Kernel with C=10.0)
+    print("Training Tuned Support Vector Machine (RBF Kernel, C=10.0)...")
+    svm_clf = SVC(kernel="rbf", C=10.0, gamma="scale", random_state=random_state)
     svm_clf.fit(X_train_scaled, y_train)
     svm_train_acc = accuracy_score(y_train, svm_clf.predict(X_train_scaled))
     svm_test_acc = accuracy_score(y_test, svm_clf.predict(X_test_scaled))

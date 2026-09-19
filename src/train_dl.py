@@ -21,18 +21,18 @@ from src.train import train_classical_models
 class SpeechMLP(nn.Module):
     """Multi-Layer Perceptron for Audio Command Classification."""
 
-    def __init__(self, in_dim: int = 26, n_classes: int = 5, dropout_p: float = 0.2):
+    def __init__(self, in_dim: int = 464, n_classes: int = 5, dropout_p: float = 0.25):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(in_dim, 64),
+            nn.Linear(in_dim, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(128, 64),
             nn.BatchNorm1d(64),
             nn.ReLU(),
             nn.Dropout(dropout_p),
-            nn.Linear(64, 32),
-            nn.BatchNorm1d(32),
-            nn.ReLU(),
-            nn.Dropout(dropout_p),
-            nn.Linear(32, n_classes),
+            nn.Linear(64, n_classes),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
