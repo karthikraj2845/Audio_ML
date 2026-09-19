@@ -1,0 +1,30 @@
+# Python virtual environments
+venv/
+env/
+ENV/
+.env
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Model checkpoints & cache
+*.pt.tmp
+*.pkl.tmp
+
+# Large raw dataset archives (allow individual wav samples)
+data/raw/*.tar.gz
+data/raw/*.zip
+data/raw/*.tar
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
