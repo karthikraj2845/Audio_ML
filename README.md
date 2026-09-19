@@ -194,7 +194,4 @@ In edge devices (e.g., True Wireless Stereo / TWS earbuds, smart speakers, heari
 
 ---
 
-## 📄 Resume Bullet Point (Tailored for Audio & Edge-AI)
 
-> **Audio ML Classifier (Speech Command Recognition)**
-> Built an end-to-end audio classification pipeline: performed preprocessing (silence trimming, resampling to 16 kHz, fixed-length padding) and extracted DSP features (STFT spectrograms, MFCCs) using Librosa and SciPy; trained and evaluated ML/DL classifiers (Random Forest, SVM, PyTorch MLP) achieving up to 66% test accuracy on Google Speech Commands; analyzed performance via confusion matrices and per-class F1-scores. Directly applied signal processing and machine learning fundamentals relevant to speech/audio and low-power edge-AI applications.
